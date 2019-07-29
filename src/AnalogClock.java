@@ -20,7 +20,6 @@ public class AnalogClock extends JFrame {
         contPanel.add(clock, BorderLayout.CENTER);
         pack();
 
-
         // Construct Timer object that moves the hands of the clock.
         int secondsHandDelay=1000;
         Timer secondsHandTimer=new Timer(secondsHandDelay, event -> {
@@ -67,8 +66,6 @@ public class AnalogClock extends JFrame {
             double secondsHandLength = radius * .9;
             Point center = new Point(200, 200);
 
-
-
             // populate clock with numbers
             int angle=300; // one o' clock point on the circle.
             for(int i=1;i<=12;i++){
@@ -99,16 +96,13 @@ public class AnalogClock extends JFrame {
             int COMPONENT_WIDTH = 400;
             int COMPONENT_HEIGHT = 400;
             return new Dimension(COMPONENT_WIDTH, COMPONENT_HEIGHT);
-
         }
     }
 
     private static void createAndShowGUI(){
-
         AnalogClock frame=new AnalogClock();
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
-
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 

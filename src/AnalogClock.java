@@ -1,77 +1,55 @@
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseAdapter;
 import java.time.ZonedDateTime;
 import java.util.logging.Logger;
 import javax.swing.*;
-import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 
 public class AnalogClock extends JFrame {
 
-    private JTextField hourField, minuteField;
-    private Clock clock;
-    private JButton drawButton;
-    private JLabel hourLabel, minuteLabel;
-    private int hours, minutes;
+    private final Clock clock;
 
-    public AnalogClock(){
+    private AnalogClock(){
+        // set JPanel as content pane so I can add a border to it.
         JPanel contPanel=new JPanel();
+        contPanel.setBorder(new LineBorder(Color.RED, 2));
         contPanel.setLayout(new BorderLayout());
         setContentPane(contPanel);
-        Logger.getGlobal().info("" + contPanel.getLayout());
-        clock=new Clock();
-        /*component.addMouseMotionListener(new MouseAdapter(){
 
-            public void mouseMoved(MouseEvent event){
-                Logger.getGlobal().info("" + String.format("(%d,%d", event.getX(), event.getY()));
-            }
-        });*/
+        // Construct clock object and add to content pane.
+        clock=new Clock();
         contPanel.add(clock, BorderLayout.CENTER);
         pack();
 
 
+        // Construct Timer object that moves the hands of the clock.
         int secondsHandDelay=1000;
-        Timer secondsHandTimer=new Timer(secondsHandDelay, new ActionListener(){
-
-            public void actionPerformed(ActionEvent event){
-                if(clock.secondAngle==360){
-                    clock.secondAngle=0;
-                }
-                if(clock.secondAngle==270){
-                    clock.minuteAngle+=6;
-                    clock.hourAngle+=.5;
-                }
-                /*if(clock.minuteAngle==270 && clock.secondAngle==270){
-                    clock.hourAngle+=30;
-                }*/
-                clock.secondAngle+=6;
-
-                clock.repaint();
+        Timer secondsHandTimer=new Timer(secondsHandDelay, event -> {
+            if(clock.secondAngle==360)
+                clock.secondAngle=0;
+            if(clock.secondAngle==270){
+                clock.minuteAngle+=6;
+                clock.hourAngle+=.5;
             }
+            clock.secondAngle+=6;
+            clock.repaint();
         });
         secondsHandTimer.start();
     }
 
-    public class Clock extends JComponent {
+    class Clock extends JComponent {
 
 
         private double hourAngle, minuteAngle, secondAngle;
 
 
         private Clock() {
+            // Get the actual system time.
             ZonedDateTime now = ZonedDateTime.now();
-            /*int hour = now.getHour()>12? now.getHour()-12: now.getHour();
+            int hour = now.getHour()>12? now.getHour()-12: now.getHour();
             int minute = now.getMinute();
+            int second = now.getSecond();
 
-            int second = now.getSecond();*/
-            int hour=4;
-            int minute=49;
-            int second=30;
-            Logger.getGlobal().info("Minute: " + minute);
-            Logger.getGlobal().info("Second: " + second);
-
+            // Because y-axis is flipped, 3 o' clock is 0 degrees, 6 o' clock is 90 degrees, 9 o' clock is 180 degrees and 12 o' clock is 270 degrees.
             hourAngle=hour>=3?(hour - 3) * 30 + (minute * .5):hour*30+(minute*.5)+270;
             minuteAngle=minute>15?(minute-15)*6:minute*6+270;
             secondAngle=second>15?(second-15)*6:second*6+270;
@@ -91,23 +69,23 @@ public class AnalogClock extends JFrame {
 
 
 
-            /*Logger.getGlobal().info("Seconds angle: " + secondAngle);
-            Logger.getGlobal().info("Minutes angle: " + minuteAngle);*/
-            Logger.getGlobal().info("" + clock.getFont());
+            // populate clock with numbers
             int angle=300; // one o' clock point on the circle.
             for(int i=1;i<=12;i++){
                 String number="" + i;
-                double stringWidth=g2d.getFontMetrics().getStringBounds(number, g2d).getWidth();
-                double stringHeight=g2d.getFontMetrics().getStringBounds(number, g2d).getHeight();
-                g2d.drawString(number, (int) (center.getX() + secondsHandLength * Math.cos(Math.toRadians(angle)) - (stringWidth/2)), (int) (center.getY() + secondsHandLength * Math.sin(Math.toRadians(angle))+(stringHeight/4))); // Why does stringHeight/4 look better than stringHeight/2??
+                double numberWidth=g2d.getFontMetrics().getStringBounds(number, g2d).getWidth();
+                double numberHeight=g2d.getFontMetrics().getStringBounds(number, g2d).getHeight();
+                g2d.drawString(number, (int) (center.getX() + secondsHandLength * Math.cos(Math.toRadians(angle)) - (numberWidth/2)), (int) (center.getY() + secondsHandLength * Math.sin(Math.toRadians(angle))+(numberHeight/4))); // Why does stringHeight/4 look better than stringHeight/2??
                 if(angle==360){
                     angle=0;
                 }
                 angle+=30;
             }
+
+            // draw clock face
             g2d.drawOval((int) center.getX() - radius, (int) center.getY() - radius, radius * 2, radius * 2);
-            // draw hour hand
             g2d.fillOval((int) center.getX()-((radius*2)/20)/2, (int) center.getY()-((radius*2)/20)/2, (radius*2)/20, (radius*2)/20);
+            // draw hour hand
             g2d.drawLine((int) center.getX(), (int) center.getY(), (int) center.getX() + (int) (hourHandLength * Math.cos(Math.toRadians(hourAngle))), (int) center.getY() + (int) (hourHandLength * Math.sin(Math.toRadians(hourAngle))));
             // draw minute hand
             g2d.drawLine((int) center.getX(), (int) center.getY(), (int) center.getX() + (int) (minuteHandLength * Math.cos(Math.toRadians(minuteAngle))), (int) center.getY() + (int) (minuteHandLength * Math.sin(Math.toRadians(minuteAngle))));
@@ -135,12 +113,7 @@ public class AnalogClock extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                AnalogClock.createAndShowGUI();
-            }
-        });
+        SwingUtilities.invokeLater(() -> AnalogClock.createAndShowGUI());
     }
 }
 

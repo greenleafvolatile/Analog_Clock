@@ -62,15 +62,15 @@ public class AnalogClock extends JFrame {
 
         private Clock() {
             ZonedDateTime now = ZonedDateTime.now();
-            int hour=5;
-            int minute=59;
-            int second=30;
             /*int hour = now.getHour()>12? now.getHour()-12: now.getHour();
             int minute = now.getMinute();
 
-            int second = now.getSecond();
+            int second = now.getSecond();*/
+            int hour=4;
+            int minute=49;
+            int second=30;
             Logger.getGlobal().info("Minute: " + minute);
-            Logger.getGlobal().info("Second: " + second);*/
+            Logger.getGlobal().info("Second: " + second);
 
             hourAngle=hour>=3?(hour - 3) * 30 + (minute * .5):hour*30+(minute*.5)+270;
             minuteAngle=minute>15?(minute-15)*6:minute*6+270;
@@ -84,23 +84,35 @@ public class AnalogClock extends JFrame {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             int radius = 100;
-            double hourHandLength = radius * .6;
-            double minuteHandLength = radius * .8;
-            double secondsHandLength = radius * .8;
+            double hourHandLength = radius * .75;
+            double minuteHandLength = radius * .9;
+            double secondsHandLength = radius * .9;
             Point center = new Point(200, 200);
 
 
 
-            Logger.getGlobal().info("Seconds angle: " + secondAngle);
-            Logger.getGlobal().info("Minutes angle: " + minuteAngle);
-            Logger.getGlobal().info("Hour angle: " + hourAngle);
-
+            /*Logger.getGlobal().info("Seconds angle: " + secondAngle);
+            Logger.getGlobal().info("Minutes angle: " + minuteAngle);*/
+            Logger.getGlobal().info("" + clock.getFont());
+            int angle=300; // one o' clock point on the circle.
+            for(int i=1;i<=12;i++){
+                String number="" + i;
+                double stringWidth=g2d.getFontMetrics().getStringBounds(number, g2d).getWidth();
+                double stringHeight=g2d.getFontMetrics().getStringBounds(number, g2d).getHeight();
+                g2d.drawString(number, (int) (center.getX() + secondsHandLength * Math.cos(Math.toRadians(angle)) - (stringWidth/2)), (int) (center.getY() + secondsHandLength * Math.sin(Math.toRadians(angle))+(stringHeight/4))); // Why does stringHeight/4 look better than stringHeight/2??
+                if(angle==360){
+                    angle=0;
+                }
+                angle+=30;
+            }
             g2d.drawOval((int) center.getX() - radius, (int) center.getY() - radius, radius * 2, radius * 2);
             // draw hour hand
+            g2d.fillOval((int) center.getX()-((radius*2)/20)/2, (int) center.getY()-((radius*2)/20)/2, (radius*2)/20, (radius*2)/20);
             g2d.drawLine((int) center.getX(), (int) center.getY(), (int) center.getX() + (int) (hourHandLength * Math.cos(Math.toRadians(hourAngle))), (int) center.getY() + (int) (hourHandLength * Math.sin(Math.toRadians(hourAngle))));
             // draw minute hand
             g2d.drawLine((int) center.getX(), (int) center.getY(), (int) center.getX() + (int) (minuteHandLength * Math.cos(Math.toRadians(minuteAngle))), (int) center.getY() + (int) (minuteHandLength * Math.sin(Math.toRadians(minuteAngle))));
             // draw seconds hand
+            g2d.setColor(Color.RED);
             g2d.drawLine((int) center.getX(), (int) center.getY(), (int) center.getX() + (int) (secondsHandLength * Math.cos(Math.toRadians(secondAngle))), (int) center.getY() + (int) (secondsHandLength * Math.sin(Math.toRadians(secondAngle))));
         }
 
